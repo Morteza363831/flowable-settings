@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2022 Flowable AG.
+    	This license is based on the software license agreement and other terms and conditions in effect between the parties at the time of purchase of the Flowable software product. Your agreement to these terms is required to install or use the Flowable software product and/or this file.
+    	Flowable is a trademark of Flowable AG registered in several countries.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.flowable.platform</groupId>
+        <artifactId>flowable-platform-apps</artifactId>
+        <version>3.13.4</version>
+    </parent>
+
+	<groupId>com.flowable.work</groupId>
+    <artifactId>flowable-work-chat-app</artifactId>
+    <packaging>war</packaging>
+
+    <properties>
+        <ci.build.number>-</ci.build.number>
+        <docker.publisher.user>-</docker.publisher.user>
+        <docker.publisher.password>-</docker.publisher.password>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.flowable.work</groupId>
+            <artifactId>flowable-work-frontend</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.flowable.engage</groupId>
+            <artifactId>flowable-spring-boot-starter-engage-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flowable.inspect</groupId>
+            <artifactId>flowable-spring-boot-starter-inspect-rest</artifactId>
+        </dependency>
+
+        <!-- If you want to have Spring Boot actuator include the following -->
+        <!-- Start actuator -->
+        <dependency>
+            <groupId>com.flowable.platform</groupId>
+            <artifactId>flowable-spring-boot-starter-platform-actuator</artifactId>
+        </dependency>
+        <!-- End actuator -->
+
+        <!-- If you are packaging your application as war add the following -->
+        <!-- Start Embedded Tomcat -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- End Embedded Tomcat -->
+
+        <!-- Start DB driver -->
+        <!-- IMPORTANT: Use the driver for the DB that the project will run on.
+        This most likely should not be h2 for you -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <!-- End DB driver -->
+
+        <!-- If you are using an external chat system you most likely
+         need a JMS client. Using ActiveMQ client is one option -->
+        <!-- Start ActiveMQ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+        <!-- End ActiveMQ -->
+
+        <!-- If you need APNs Push Notification for a mobile device include the following -->
+        <!-- Start APNs -->
+        <dependency>
+            <groupId>com.flowable.engage</groupId>
+            <artifactId>flowable-engage-notification-apns</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.turo</groupId>
+            <artifactId>pushy-micrometer-metrics-listener</artifactId>
+        </dependency>
+        <!-- End APNs -->
+
+        <!-- If you need to trigger a process for a message for a user that is not offline include the following -->
+        <!-- Start Process notification -->
+        <dependency>
+            <groupId>com.flowable.platform</groupId>
+            <artifactId>flowable-notification-process</artifactId>
+        </dependency>
+        <!-- End Process notification -->
+
+        <!-- Start Optional dependencies that can help in demos -->
+        <dependency>
+            <groupId>com.flowable.platform</groupId>
+            <artifactId>flowable-tenant-setup</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flowable.work</groupId>
+            <artifactId>flowable-work-chat-default-models</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flowable.work</groupId>
+            <artifactId>flowable-work-chat-default-idm-models</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flowable.engage</groupId>
+            <artifactId>flowable-engage-example-apps</artifactId>
+        </dependency>
+        <!-- End Optional dependencies that can help in demos -->
+
+        <!-- WebDav support is added by default (but needs flowable.webdav.enabled=true) for the Engage Application
+            projects only need to add this dependency for the WebDav to be enabled. -->
+        <dependency>
+            <groupId>com.flowable.platform</groupId>
+            <artifactId>flowable-webdav</artifactId>
+        </dependency>
+
+        <!-- LDAP needed only if projects need to use the Ldap Identity Service -->
+        <dependency>
+            <groupId>com.flowable.core</groupId>
+            <artifactId>flowable-spring-boot-starter-ldap</artifactId>
+        </dependency>
+
+        <!-- LDAP Security needed only if projects need to use the LDAP Security -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+
+        <!-- OAuth2 Client needed only if projects needs to use OAuth2 Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <!--
+            OAuth2 Resource Server needed only if projects need to use OAuth2 Security to communicate with the Flowable REST API.
+            e.g. machine to machine, Flowable Control to Work, Flowable Design to Work
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <!-- Rabbit (AMQP) needed only if projects need to use the Rabbit Event Registry Support -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <!-- Kafka needed only if projects need to use the Kafka Event Registry Support -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- AWS SQS needed only if projects need to use the AWS SQS Event Registry Support -->
+        <dependency>
+            <groupId>com.flowable.core</groupId>
+            <artifactId>flowable-spring-boot-starter-aws-sqs</artifactId>
+        </dependency>
+
+        <!-- AWS SNS needed only if projects need to use the AWS SNS Event Registry Support -->
+        <dependency>
+            <groupId>com.flowable.core</groupId>
+            <artifactId>flowable-spring-boot-starter-aws-sns</artifactId>
+        </dependency>
+
+        <!-- AWS S3 needed only if projects need to use the AWS S3 Content Storage Support -->
+        <dependency>
+            <groupId>com.flowable.core</groupId>
+            <artifactId>flowable-spring-boot-starter-aws-s3</artifactId>
+        </dependency>
+
+        <!-- Azure Blob Storage only if project needs to use the Azure Blob Content Storage Support -->
+        <dependency>
+            <groupId>com.flowable.core</groupId>
+            <artifactId>flowable-spring-boot-starter-azure-blob-storage</artifactId>
+        </dependency>
+
+        <!-- Start encrypted properties -->
+        <!--
+            Spring Cloud Context is needed only if you want to support encrypted Properties.
+            This dependency is explicitly not managed, in order to avoid potential clashes with customers using Spring Cloud themselves.
+            It is also explicitly the minimal dependency needed to support encrypted properties.
+         -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-context</artifactId>
+            <version>${spring-cloud-context.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-rsa</artifactId>
+        </dependency>
+        <!-- End encrypted properties -->
+
+        <!-- Start metrics -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-elastic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <!-- End metrics -->
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>${okhttp.mockwebserver.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.mockwebserver.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>java17+</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openjdk.nashorn</groupId>
+                    <artifactId>nashorn-core</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <!-- docker image build -->
+        <profile>
+            <id>docker</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <!-- Add the starter-tomcat as a compile dependency, in order to be in the libs for jib -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <configuration>
+                            <from>
+                                <image>artifacts.flowable.com/flowable/flowable-jre:11.0.18</image>
+                            </from>
+                            <to>
+                                <image>flowable-work-chat</image>
+                            </to>
+                            <container>
+                                <environment>
+                                    <FLOWABLE_LICENSE_DB-STORE-ENABLED>true</FLOWABLE_LICENSE_DB-STORE-ENABLED>
+                                </environment>
+                            </container>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.google.cloud.tools</groupId>
+                    <artifactId>jib-maven-plugin</artifactId>
+                    <configuration>
+                        <container>
+                            <appRoot>/app</appRoot>
+                            <ports>
+                                <port>8080</port>
+                            </ports>
+                            <environment>
+                                <JAVA_OPTS>-Xmx1024M</JAVA_OPTS>
+                                <SERVER_PORT>8080</SERVER_PORT>
+                            </environment>
+                            <user>flowable:flowable</user>
+                            <entrypoint>
+                                <entrypoint>/flowable-entrypoint.sh</entrypoint>
+                            </entrypoint>
+                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        </container>
+                        <extraDirectories>
+                            <paths>src/main/jib</paths>
+                            <permissions>
+                                <permission>
+                                    <file>/flowable-entrypoint.sh</file>
+                                    <mode>555</mode> <!-- Read/execute for owner, read for group/other -->
+                                </permission>
+                            </permissions>
+                        </extraDirectories>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
